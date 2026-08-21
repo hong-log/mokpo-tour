@@ -14,6 +14,7 @@ html,
 body,
 #root {
   min-height: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -77,6 +78,22 @@ body {
 .time-input {
   color-scheme: light;
   font-variant-numeric: tabular-nums;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.time-input::-webkit-datetime-edit,
+.time-input::-webkit-datetime-edit-fields-wrapper {
+  min-width: 0;
+  padding: 0;
+}
+
+.time-input::-webkit-calendar-picker-indicator {
+  margin-inline-start: 2px;
+  flex-shrink: 0;
 }
 
 .memo-field {

@@ -718,11 +718,11 @@ export default function App() {
 
   return (
     <div className="min-h-dvh bg-[#cfe6f4] text-slate-800">
-      <div className="relative mx-auto min-h-dvh w-full max-w-[430px] overflow-hidden bg-[#eef6fb] shadow-[0_0_60px_rgba(61,126,175,0.18)]">
+      <div className="relative mx-auto min-h-dvh w-full max-w-[430px] overflow-x-clip bg-[#eef6fb] shadow-[0_0_60px_rgba(61,126,175,0.18)]">
         <Header />
         <TabBar tab={tab} onChange={setTab} />
-        <main className="px-4 pb-10 pt-3">
-          <div key={tab} className="animate-fade-up">
+        <main className="min-w-0 px-4 pb-10 pt-3">
+          <div key={tab} className="min-w-0 animate-fade-up">
             {tab === "day1" && (
               <Timeline
                 label="토요일"
@@ -1149,7 +1149,7 @@ function SunDivider({ kind, time }: { kind: SunKind; time: string }) {
   const text = isSunrise ? "text-amber-500" : "text-orange-400";
 
   return (
-    <li className="grid grid-cols-[22px_1fr] gap-3">
+    <li className="grid min-w-0 grid-cols-[22px_minmax(0,1fr)] gap-3">
       <div className="flex flex-col items-center py-1">
         <span className="w-px flex-1 border-l border-dashed border-sky-200" />
         <span className="my-0.5 text-[11px]" aria-hidden>
@@ -1327,14 +1327,14 @@ function TransitCard({
   const expanded = open;
 
   return (
-    <li className="grid grid-cols-[22px_1fr] gap-3">
+    <li className="grid min-w-0 grid-cols-[22px_minmax(0,1fr)] gap-3">
       <div className="flex flex-col items-center py-0.5">
         <span className="w-px flex-1 border-l border-dashed border-sky-300" />
         <span className="my-0.5 text-[12px] font-bold text-[#6BA8D9]">↓</span>
         <span className="w-px flex-1 border-l border-dashed border-sky-300" />
       </div>
 
-      <div className="mb-3 overflow-hidden rounded-xl bg-white/90 shadow-[0_8px_20px_rgba(91,140,180,0.08)] ring-1 ring-sky-100">
+      <div className="mb-3 min-w-0 overflow-hidden rounded-xl bg-white/90 shadow-[0_8px_20px_rgba(91,140,180,0.08)] ring-1 ring-sky-100">
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
@@ -1466,7 +1466,7 @@ function TimelineCard({
   const timeDisplay = item.timeDisplay ?? "range";
 
   return (
-    <li className="grid grid-cols-[22px_1fr] gap-3">
+    <li className="grid min-w-0 grid-cols-[22px_minmax(0,1fr)] gap-3">
       <div className="flex flex-col items-center">
         <span
           className={[
@@ -1483,7 +1483,7 @@ function TimelineCard({
       <article
         className={[
           isLast ? "mb-3" : "mb-1",
-          "rounded-xl bg-white p-4 shadow-[0_10px_28px_rgba(91,140,180,0.12)]",
+          "min-w-0 overflow-hidden rounded-xl bg-white p-4 shadow-[0_10px_28px_rgba(91,140,180,0.12)]",
           item.highlight ? "ring-2 ring-[#E8A08A]/50" : "",
           onOpenGuide
             ? "cursor-pointer ring-1 ring-[#cfe8f6] active:bg-sky-50"
@@ -1562,7 +1562,7 @@ function TimelineCard({
                   {item.title}
                 </h3>
                 {item.place && (
-                  <p className="mt-0.5 text-[12px] font-medium text-slate-500">
+                  <p className="mt-0.5 break-words text-[12px] font-medium text-slate-500">
                     {item.place}
                   </p>
                 )}
@@ -1631,7 +1631,13 @@ function TimelineCard({
           </div>
         )}
 
-        <div className="mt-3 flex items-center gap-1.5">
+        <div
+          className={
+            timeDisplay === "range"
+              ? "mt-3 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-1.5"
+              : "mt-3 min-w-0"
+          }
+        >
           {timeDisplay === "checkin" && (
             <TimeField
               value={item.startTime}
@@ -1653,7 +1659,7 @@ function TimelineCard({
                 onChange={(startTime) => onChange({ startTime })}
                 label="시작"
               />
-              <span className="text-[12px] font-semibold text-slate-300">
+              <span className="self-center text-[12px] font-semibold text-slate-300">
                 ~
               </span>
               <TimeField
@@ -1748,7 +1754,7 @@ function MapLinks({ spots }: { spots: MapSpot[] }) {
             href={naverMapUrl(spot.name || spot.address, spot.address || spot.name)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-start gap-1.5 rounded-md py-0.5 active:bg-sky-50"
+            className="flex min-w-0 items-start gap-1.5 rounded-md py-0.5 active:bg-sky-50"
           >
             <span className="mt-px text-[12px]" aria-hidden>
               📍
@@ -1759,7 +1765,7 @@ function MapLinks({ spots }: { spots: MapSpot[] }) {
                   {spot.name}
                 </span>
               )}
-              <span className="block text-[12px] leading-4 text-[#3D7EAF] underline decoration-sky-200 underline-offset-2">
+              <span className="block break-words text-[12px] leading-4 text-[#3D7EAF] underline decoration-sky-200 underline-offset-2">
                 {spot.address || spot.name}
               </span>
             </span>
@@ -1816,15 +1822,13 @@ function TimeField({
   label: string;
 }) {
   return (
-    <label className="flex min-w-0 flex-1 items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-2 ring-1 ring-sky-100 focus-within:ring-2 focus-within:ring-sky-300">
-      <span className="shrink-0 text-[10px] font-bold text-[#6BA8D9]">
-        {label}
-      </span>
+    <label className="flex min-w-0 w-full flex-col gap-0.5 overflow-hidden rounded-lg bg-sky-50 px-2.5 py-1.5 ring-1 ring-sky-100 focus-within:ring-2 focus-within:ring-sky-300">
+      <span className="text-[10px] font-bold text-[#6BA8D9]">{label}</span>
       <input
         type="time"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="time-input min-w-0 flex-1 bg-transparent text-[13px] font-bold text-slate-700 outline-none"
+        className="time-input min-w-0 bg-transparent text-[13px] font-bold text-slate-700 outline-none"
       />
     </label>
   );
@@ -1833,9 +1837,9 @@ function TimeField({
 function TicketStrip({ ticket }: { ticket: Ticket }) {
   return (
     <div className="relative mt-3 overflow-hidden rounded-lg bg-gradient-to-r from-sky-50 to-indigo-50 px-3 py-3">
-      <div className="mb-2 flex items-center justify-between text-[11px] font-bold text-[#3D7EAF]">
-        <span>🎫 {ticket.train}</span>
-        <span>{ticket.car}</span>
+      <div className="mb-2 flex min-w-0 items-center justify-between gap-2 text-[11px] font-bold text-[#3D7EAF]">
+        <span className="min-w-0 truncate">🎫 {ticket.train}</span>
+        <span className="shrink-0">{ticket.car}</span>
       </div>
       <div className="grid grid-cols-2 gap-2">
         {ticket.seats.map((seat) => (
