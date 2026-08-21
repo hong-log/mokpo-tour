@@ -37,6 +37,7 @@ type TimelineItem = {
   startTime: string;
   endTime: string;
   timeDisplay?: TimeDisplay;
+  checkInTime?: string;
   emoji: string;
   title: string;
   place: string;
@@ -329,6 +330,7 @@ const DAY1: TimelineItem[] = [
     startTime: "18:30",
     endTime: "",
     timeDisplay: "checkin",
+    checkInTime: "16:00",
     emoji: "🏠",
     title: "숙소 체크인",
     place: "브라운도트 목포평화광장점",
@@ -607,9 +609,8 @@ function applyScheduleDefaults(items: TimelineItem[], defaults: TimelineItem[]) 
       startTime:
         def.timeDisplay === "checkin" || def.timeDisplay === "checkout"
           ? def.startTime
-          : item.id === "d1-checkin" && item.startTime === "16:00"
-            ? def.startTime
-            : item.startTime || def.startTime,
+          : item.startTime || def.startTime,
+      checkInTime: def.checkInTime ?? item.checkInTime,
       endTime: item.endTime || def.endTime,
     };
   });
@@ -1647,11 +1648,20 @@ function TimelineCard({
           className={
             timeDisplay === "range"
               ? "mt-3 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-1.5"
-              : "mt-3 min-w-0"
+              : timeDisplay === "checkin"
+                ? "mt-3 grid min-w-0 grid-cols-2 items-stretch gap-1.5"
+                : "mt-3 min-w-0"
           }
         >
           {timeDisplay === "checkin" && (
-            <TimeField value={item.startTime} label="체크인" locked />
+            <>
+              <TimeField
+                value={item.checkInTime ?? "16:00"}
+                label="체크인"
+                locked
+              />
+              <TimeField value={item.startTime} label="도착 예정" locked />
+            </>
           )}
           {timeDisplay === "checkout" && (
             <TimeField value={item.startTime} label="체크아웃" locked />
