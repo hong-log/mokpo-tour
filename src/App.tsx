@@ -101,6 +101,16 @@ function timeToMinutes(time: string) {
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+function formatDisplayTime(time: string) {
+  const minutes = timeToMinutes(time);
+  if (minutes == null) return time;
+  const hours = Math.floor(minutes / 60);
+  const mins = String(minutes % 60).padStart(2, "0");
+  const period = hours < 12 ? "오전" : "오후";
+  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+  return `${period} ${hour12}:${mins}`;
+}
+
 type SunKind = "sunrise" | "sunset";
 
 type SunTimes = {
@@ -595,9 +605,11 @@ function applyScheduleDefaults(items: TimelineItem[], defaults: TimelineItem[]) 
       ...item,
       maps,
       startTime:
-        item.id === "d1-checkin" && item.startTime === "16:00"
+        def.timeDisplay === "checkin" || def.timeDisplay === "checkout"
           ? def.startTime
-          : item.startTime || def.startTime,
+          : item.id === "d1-checkin" && item.startTime === "16:00"
+            ? def.startTime
+            : item.startTime || def.startTime,
       endTime: item.endTime || def.endTime,
     };
   });
@@ -1639,18 +1651,10 @@ function TimelineCard({
           }
         >
           {timeDisplay === "checkin" && (
-            <TimeField
-              value={item.startTime}
-              onChange={(startTime) => onChange({ startTime })}
-              label="체크인"
-            />
+            <TimeField value={item.startTime} label="체크인" locked />
           )}
           {timeDisplay === "checkout" && (
-            <TimeField
-              value={item.startTime}
-              onChange={(startTime) => onChange({ startTime })}
-              label="체크아웃"
-            />
+            <TimeField value={item.startTime} label="체크아웃" locked />
           )}
           {timeDisplay === "range" && (
             <>
@@ -1816,21 +1820,29 @@ function TimeField({
   value,
   onChange,
   label,
+  locked = false,
 }: {
   value: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   label: string;
+  locked?: boolean;
 }) {
   return (
-    <label className="flex min-w-0 w-full flex-col gap-0.5 overflow-hidden rounded-lg bg-sky-50 px-2.5 py-1.5 ring-1 ring-sky-100 focus-within:ring-2 focus-within:ring-sky-300">
+    <div className="flex min-w-0 w-full flex-col gap-0.5 overflow-hidden rounded-lg bg-sky-50 px-2.5 py-1.5 ring-1 ring-sky-100 focus-within:ring-2 focus-within:ring-sky-300">
       <span className="text-[10px] font-bold text-[#6BA8D9]">{label}</span>
-      <input
-        type="time"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="time-input min-w-0 bg-transparent text-[13px] font-bold text-slate-700 outline-none"
-      />
-    </label>
+      {locked ? (
+        <p className="text-[13px] font-bold tabular-nums text-slate-700">
+          {formatDisplayTime(value)}
+        </p>
+      ) : (
+        <input
+          type="time"
+          value={value}
+          onChange={(event) => onChange?.(event.target.value)}
+          className="time-input min-w-0 bg-transparent text-[13px] font-bold text-slate-700 outline-none"
+        />
+      )}
+    </div>
   );
 }
 
